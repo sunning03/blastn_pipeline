@@ -5,19 +5,27 @@ import logging
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 def run_makeblastdb(db_name):
     """
     创建 BLAST 数据库。
     :param db_name: 数据库名称
     """
+    # 检查文件是否存在
     fa_file = f"{db_name}.fa"
-    if not os.path.exists(fa_file):
-        logging.error(f"File {fa_file} does not exist.")
+    fasta_file = f"{db_name}.fasta"
+    
+    if os.path.exists(fa_file):
+        input_file = fa_file
+    elif os.path.exists(fasta_file):
+        input_file = fasta_file
+    else:
+        logging.error(f"Neither {fa_file} nor {fasta_file} exists.")
         return
     
-    command = f"makeblastdb -in {fa_file} -dbtype nucl -parse_seqids -out {db_name}"
+    # 构建命令
+    command = f"makeblastdb -in {input_file} -dbtype nucl -parse_seqids -out {db_name}"
     logging.info(f"Executing command: {command}")
+    
     try:
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         logging.info("Command output:")
@@ -28,14 +36,24 @@ def run_makeblastdb(db_name):
     except subprocess.CalledProcessError as e:
         logging.error(f"Command execution failed: {e}")
         logging.error(f"Error output: {e.stderr}")
-
 def run_blastn(db_name, query_name):
     """
     运行 BLAST 搜索。
     :param db_name: 数据库名称
     :param query_name: 查询序列文件名
     """
-    query_file = f"{query_name}.fa"
+
+    # 检查文件是否存在
+    fa_file = f"{db_name}.fa"
+    fasta_file = f"{db_name}.fasta"
+    
+    if os.path.exists(fa_file):
+        query_file = fa_file
+    elif os.path.exists(fasta_file):
+        query_file = fasta_file
+    else:
+        logging.error(f"Neither {fa_file} nor {fasta_file} exists.")
+        return
     if not os.path.exists(query_file):
         logging.error(f"File {query_file} does not exist.")
         return
