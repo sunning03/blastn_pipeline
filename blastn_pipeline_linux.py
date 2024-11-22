@@ -44,8 +44,8 @@ def run_blastn(db_name, query_name):
     """
 
     # 检查文件是否存在
-    fa_file = f"{db_name}.fa"
-    fasta_file = f"{db_name}.fasta"
+    fa_file = f"{query_name}.fa"
+    fasta_file = f"{query_name}.fasta"
     
     if os.path.exists(fa_file):
         query_file = fa_file
